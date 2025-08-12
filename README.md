@@ -1,4 +1,4 @@
-#MediMate – Your Personal Medicine Reminder App
+# MediMate – Your Personal Medicine Reminder App
 
 1. Project Title
 MediMate – A React Native App for Medicine Reminders and Health Tracking

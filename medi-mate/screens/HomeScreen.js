@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
-  ScrollView,
 } from "react-native";
 import { useMedicine } from "../context/MedicineContext";
 import MedicineCalendar from "../components/MedicineCalendar";
@@ -145,13 +144,9 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={true}
-      keyboardShouldPersistTaps="handled"
-    >
+  // Compose all header content here
+  const ListHeaderComponent = (
+    <>
       <View style={styles.header}>
         <Text style={styles.title}>MediMate</Text>
         <Text style={styles.subtitle}>Your Medicine Reminders</Text>
@@ -167,6 +162,7 @@ export default function HomeScreen({ navigation }) {
               `${item.medicineId}_${item.time}_${index}`
             }
             showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
           />
         </View>
       )}
@@ -184,26 +180,31 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>All Medicines</Text>
-        {medicines.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No medicines added yet</Text>
-            <Text style={styles.emptySubtext}>
-              Tap the + button to add your first medicine
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={medicines}
-            renderItem={renderMedicine}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
-        )}
       </View>
-    </ScrollView>
+    </>
+  );
+
+  return (
+    <FlatList
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      data={medicines}
+      renderItem={renderMedicine}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={ListHeaderComponent}
+      ListEmptyComponent={
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No medicines added yet</Text>
+          <Text style={styles.emptySubtext}>
+            Tap the + button to add your first medicine
+          </Text>
+        </View>
+      }
+      showsVerticalScrollIndicator={true}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    />
   );
 }
 

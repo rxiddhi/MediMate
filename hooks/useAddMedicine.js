@@ -2,9 +2,6 @@ import { useState, useCallback } from "react";
 import { Alert } from "react-native";
 import { useMedicine } from "../context/MedicineContext";
 
-/**
- * Custom hook for AddMedicineScreen logic
- */
 export const useAddMedicine = (navigation) => {
   const { addMedicine } = useMedicine();
 

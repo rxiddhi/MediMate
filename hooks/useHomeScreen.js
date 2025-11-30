@@ -2,10 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Alert } from "react-native";
 import { useMedicine } from "../context/MedicineContext";
 
-/**
- * Custom hook for HomeScreen logic
- * Separates business logic from UI
- */
 export const useHomeScreen = (navigation) => {
   const {
     medicines,

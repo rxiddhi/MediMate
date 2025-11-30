@@ -7,10 +7,6 @@ import {
   ScrollView,
 } from "react-native";
 
-/**
- * Error Boundary Component
- * Catches JavaScript errors anywhere in the child component tree
- */
 class AppErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -27,17 +23,13 @@ class AppErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log error to console
     console.error("Error caught by boundary:", error, errorInfo);
 
-    // Update state with error details
     this.setState({
       error,
       errorInfo,
     });
 
-    // You can also log the error to an error reporting service here
-    // Example: logErrorToService(error, errorInfo);
   }
 
   handleReset = () => {

@@ -1,20 +1,13 @@
 import React, { createContext, useContext, useReducer } from "react";
-<<<<<<< HEAD
-import AsyncStorage from "@react-native-async-storage/async-storage";
-=======
 import storageService from "../services/storageService";
 import notificationService from "../services/notificationService";
->>>>>>> dd0e490 (changes)
 
 const MedicineContext = createContext();
 
 const initialState = {
   medicines: [],
-<<<<<<< HEAD
-=======
   appointments: [],
   medicineHistory: [],
->>>>>>> dd0e490 (changes)
   profile: null,
   loading: false,
   error: null,
@@ -46,8 +39,6 @@ const medicineReducer = (state, action) => {
       return { ...state, profile: action.payload };
     case "UPDATE_PROFILE":
       return { ...state, profile: action.payload };
-<<<<<<< HEAD
-=======
     case "LOAD_APPOINTMENTS":
       return { ...state, appointments: action.payload, loading: false };
     case "ADD_APPOINTMENT":
@@ -71,7 +62,6 @@ const medicineReducer = (state, action) => {
       };
     case "LOAD_MEDICINE_HISTORY":
       return { ...state, medicineHistory: action.payload };
->>>>>>> dd0e490 (changes)
     default:
       return state;
   }
@@ -83,17 +73,10 @@ export const MedicineProvider = ({ children }) => {
   const loadMedicines = async () => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
-<<<<<<< HEAD
-      const medicines = await AsyncStorage.getItem("@medimates_medicines");
-      dispatch({
-        type: "LOAD_MEDICINES",
-        payload: medicines ? JSON.parse(medicines) : [],
-=======
       const medicines = await storageService.getMedicines();
       dispatch({
         type: "LOAD_MEDICINES",
         payload: medicines || [],
->>>>>>> dd0e490 (changes)
       });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -112,17 +95,10 @@ export const MedicineProvider = ({ children }) => {
       };
 
       const updatedMedicines = [...state.medicines, newMedicine];
-<<<<<<< HEAD
-      await AsyncStorage.setItem(
-        "@medimates_medicines",
-        JSON.stringify(updatedMedicines)
-      );
-=======
       await storageService.saveMedicines(updatedMedicines);
 
       // Schedule notifications
       await notificationService.scheduleMedicineNotifications(newMedicine);
->>>>>>> dd0e490 (changes)
 
       dispatch({ type: "ADD_MEDICINE", payload: newMedicine });
     } catch (error) {
@@ -137,24 +113,11 @@ export const MedicineProvider = ({ children }) => {
         med.id === id ? { ...med, ...updates } : med
       );
 
-<<<<<<< HEAD
-      await AsyncStorage.setItem(
-        "@medimates_medicines",
-        JSON.stringify(updatedMedicines)
-      );
-
-      const updatedMedicine = updatedMedicines.find((med) => med.id === id);
-=======
       await storageService.saveMedicines(updatedMedicines);
-
       const updatedMedicine = updatedMedicines.find((med) => med.id === id);
-
-      // Update notifications if times or frequency changed
       if (updates.times || updates.frequency) {
         await notificationService.updateMedicineNotifications(updatedMedicine);
       }
-
->>>>>>> dd0e490 (changes)
       dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -165,42 +128,15 @@ export const MedicineProvider = ({ children }) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
       const updatedMedicines = state.medicines.filter((med) => med.id !== id);
-
-<<<<<<< HEAD
-      await AsyncStorage.setItem(
-        "@medimates_medicines",
-        JSON.stringify(updatedMedicines)
-      );
-=======
       await storageService.saveMedicines(updatedMedicines);
 
       // Cancel notifications
       await notificationService.cancelMedicineNotifications(id);
-
->>>>>>> dd0e490 (changes)
       dispatch({ type: "DELETE_MEDICINE", payload: id });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
     }
   };
-
-<<<<<<< HEAD
-  const markDoseTaken = async (id) => {
-    try {
-      const medicine = state.medicines.find((med) => med.id === id);
-      if (medicine) {
-        const updatedMedicines = state.medicines.map((med) =>
-          med.id === id ? { ...med, lastTaken: new Date().toISOString() } : med
-        );
-
-        await AsyncStorage.setItem(
-          "@medimates_medicines",
-          JSON.stringify(updatedMedicines)
-        );
-
-        const updatedMedicine = updatedMedicines.find((med) => med.id === id);
-        dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
-=======
   const markDoseTaken = async (id, scheduledTime = null) => {
     try {
       const medicine = state.medicines.find((med) => med.id === id);
@@ -252,7 +188,6 @@ export const MedicineProvider = ({ children }) => {
 
         // Reload history to update UI
         loadMedicineHistory();
->>>>>>> dd0e490 (changes)
       }
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -261,17 +196,10 @@ export const MedicineProvider = ({ children }) => {
 
   const loadProfile = async () => {
     try {
-<<<<<<< HEAD
-      const profile = await AsyncStorage.getItem("@medimates_profile");
-      dispatch({
-        type: "LOAD_PROFILE",
-        payload: profile ? JSON.parse(profile) : null,
-=======
       const profile = await storageService.getProfile();
       dispatch({
         type: "LOAD_PROFILE",
         payload: profile,
->>>>>>> dd0e490 (changes)
       });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -281,14 +209,7 @@ export const MedicineProvider = ({ children }) => {
   const updateProfile = async (profileData) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
-<<<<<<< HEAD
-      await AsyncStorage.setItem(
-        "@medimates_profile",
-        JSON.stringify(profileData)
-      );
-=======
       await storageService.saveProfile(profileData);
->>>>>>> dd0e490 (changes)
       dispatch({ type: "UPDATE_PROFILE", payload: profileData });
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
@@ -325,8 +246,6 @@ export const MedicineProvider = ({ children }) => {
     return upcoming.sort((a, b) => a.scheduledTime - b.scheduledTime);
   };
 
-<<<<<<< HEAD
-=======
   const loadAppointments = async () => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
@@ -407,7 +326,6 @@ export const MedicineProvider = ({ children }) => {
     }
   };
 
->>>>>>> dd0e490 (changes)
   const value = {
     ...state,
     loadMedicines,
@@ -415,11 +333,6 @@ export const MedicineProvider = ({ children }) => {
     updateMedicine,
     deleteMedicine,
     markDoseTaken,
-<<<<<<< HEAD
-    loadProfile,
-    updateProfile,
-    getUpcomingDoses,
-=======
     markDoseSkipped,
     loadProfile,
     updateProfile,
@@ -428,8 +341,7 @@ export const MedicineProvider = ({ children }) => {
     addAppointment,
     updateAppointment,
     deleteAppointment,
-    loadMedicineHistory,
->>>>>>> dd0e490 (changes)
+    loadMedicineHistory
   };
 
   console.log("MedicineContext value:", Object.keys(value));

@@ -164,18 +164,21 @@ export default function ProfileScreen() {
             "List any allergies you have",
             true
           )}
+
           {renderField(
             "Medical Notes",
             "medicalNotes",
             "Any important medical information",
             true
           )}
+
           {renderField(
             "Doctor Information",
             "doctorInfo",
             "Your doctor's name and contact",
             true
           )}
+
         </View>
 
         <View style={styles.section}>

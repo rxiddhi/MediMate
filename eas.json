@@ -15,6 +15,7 @@
         "gradleCommand": ":app:assembleDebug"
       }
     },
+
     "preview": {
       "distribution": "internal",
       "ios": {
@@ -26,6 +27,7 @@
         "gradleCommand": ":app:assembleRelease"
       }
     },
+    
     "production": {
       "ios": {
         "buildConfiguration": "Release"
@@ -34,6 +36,7 @@
         "buildType": "app-bundle"
       }
     }
+
   },
   "submit": {
     "production": {}

@@ -6,12 +6,15 @@ export default {
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "automatic",
+
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
       backgroundColor: "#27ae60",
     },
+
     assetBundlePatterns: ["**/*"],
+
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.medimate.app",
@@ -19,6 +22,7 @@ export default {
         UIBackgroundModes: ["remote-notification"],
       },
     },
+
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
@@ -32,10 +36,13 @@ export default {
         "POST_NOTIFICATIONS",
       ],
     },
+
     web: {
       favicon: "./assets/favicon.png",
     },
+
     scheme: "medimate",
+
     plugins: [
       [
         "expo-notifications",
@@ -46,6 +53,7 @@ export default {
         },
       ],
     ],
+
     extra: {
       eas: {
         projectId: "your-project-id-here",

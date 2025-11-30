@@ -8,7 +8,6 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import RootNavigator from "./navigation/RootNavigator";
 import notificationService from "./services/notificationService";
 
-// Deep linking configuration
 const linking = {
   prefixes: [Linking.createURL("/"), "medimate://"],
   config: {
@@ -31,17 +30,12 @@ function AppContent() {
   const navigationRef = useRef();
 
   useEffect(() => {
-    // Request notification permissions
     notificationService.requestPermissions();
 
-    // Set notification categories
     notificationService.setNotificationCategories();
 
-    // Setup notification listener for deep linking
     const subscription =
-      notificationService.setupNotificationListener(navigationRef);
-
-    // Handle notification that opened the app from killed state
+    notificationService.setupNotificationListener(navigationRef);
     notificationService.getLastNotificationResponse().then((response) => {
       if (response && response.notification.request.content.data.screen) {
         const data = response.notification.request.content.data;

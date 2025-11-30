@@ -1,10 +1,5 @@
 import * as Notifications from "expo-notifications";
 import storageService from "./storageService";
-
-/**
- * Notification Service
- * Handles advanced notification scheduling, editing, canceling, and deep linking
- */
 class NotificationService {
   constructor() {
     this.setupNotificationHandler();
@@ -20,10 +15,6 @@ class NotificationService {
     });
   }
 
-  /**
-   * Request notification permissions
-   * @returns {Promise<boolean>} Permission granted status
-   */
   async requestPermissions() {
     try {
       const { status: existingStatus } =
@@ -42,10 +33,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Schedule notifications for a medicine
-   * Supports daily, weekly, and monthly recurring patterns
-   */
   async scheduleMedicineNotifications(medicine) {
     try {
       const hasPermission = await this.requestPermissions();
@@ -88,8 +75,6 @@ class NotificationService {
           time,
         });
       }
-
-      // Save notification IDs for later management
       await this.saveNotificationMapping(medicine.id, scheduledIds);
 
       return scheduledIds;
@@ -99,15 +84,10 @@ class NotificationService {
     }
   }
 
-  /**
-   * Create trigger based on frequency
-   */
   createTrigger(frequency, hours, minutes, recurringPattern = null) {
     const now = new Date();
     const scheduledTime = new Date();
     scheduledTime.setHours(hours, minutes, 0, 0);
-
-    // If the time has already passed today, schedule for tomorrow
     if (scheduledTime <= now) {
       scheduledTime.setDate(scheduledTime.getDate() + 1);
     }
@@ -121,17 +101,15 @@ class NotificationService {
         };
 
       case "weekly":
-        // Repeat on specific days of the week
         const weekday = recurringPattern?.weekdays || [new Date().getDay()];
         return {
-          weekday: weekday[0], // First selected weekday
+          weekday: weekday[0],
           hour: hours,
           minute: minutes,
           repeats: true,
         };
 
       case "monthly":
-        // Repeat on specific day of month
         const day = recurringPattern?.dayOfMonth || new Date().getDate();
         return {
           day: day,
@@ -141,7 +119,6 @@ class NotificationService {
         };
 
       case "custom":
-        // One-time or custom interval
         return {
           date: scheduledTime,
           repeats: recurringPattern?.interval ? true : false,
@@ -156,15 +133,9 @@ class NotificationService {
     }
   }
 
-  /**
-   * Update notifications for a medicine
-   */
   async updateMedicineNotifications(medicine) {
     try {
-      // Cancel existing notifications
       await this.cancelMedicineNotifications(medicine.id);
-
-      // Schedule new notifications
       return await this.scheduleMedicineNotifications(medicine);
     } catch (error) {
       console.error("Error updating notifications:", error);
@@ -172,9 +143,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Cancel all notifications for a medicine
-   */
   async cancelMedicineNotifications(medicineId) {
     try {
       const mappings = await this.getNotificationMapping(medicineId);
@@ -185,8 +153,6 @@ class NotificationService {
             mapping.notificationId
           );
         }
-
-        // Remove from storage
         await this.removeNotificationMapping(medicineId);
       }
     } catch (error) {
@@ -195,9 +161,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Cancel a specific notification
-   */
   async cancelNotification(notificationId) {
     try {
       await Notifications.cancelScheduledNotificationAsync(notificationId);
@@ -207,9 +170,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Cancel all scheduled notifications
-   */
   async cancelAllNotifications() {
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
@@ -220,9 +180,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Get all scheduled notifications
-   */
   async getAllScheduledNotifications() {
     try {
       return await Notifications.getAllScheduledNotificationsAsync();
@@ -232,9 +189,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Save notification mapping to storage
-   */
   async saveNotificationMapping(medicineId, scheduledIds) {
     try {
       const notifications = await storageService.getNotifications();
@@ -249,9 +203,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Get notification mapping for a medicine
-   */
   async getNotificationMapping(medicineId) {
     try {
       const notifications = await storageService.getNotifications();
@@ -263,9 +214,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Remove notification mapping
-   */
   async removeNotificationMapping(medicineId) {
     try {
       const notifications = await storageService.getNotifications();
@@ -276,11 +224,7 @@ class NotificationService {
     }
   }
 
-  /**
-   * Setup notification response listener for deep linking
-   */
   setupNotificationListener(navigationRef) {
-    // Handle notification tap when app is in foreground/background
     const subscription = Notifications.addNotificationResponseReceivedListener(
       (response) => {
         const data = response.notification.request.content.data;
@@ -296,9 +240,6 @@ class NotificationService {
     return subscription;
   }
 
-  /**
-   * Get last notification response (for app opened from killed state)
-   */
   async getLastNotificationResponse() {
     try {
       return await Notifications.getLastNotificationResponseAsync();
@@ -308,9 +249,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Set notification categories for iOS
-   */
   async setNotificationCategories() {
     try {
       await Notifications.setNotificationCategoryAsync("MEDICINE_REMINDER", [
@@ -334,9 +272,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Schedule notification for an appointment
-   */
   async scheduleAppointmentNotification(appointment) {
     try {
       const hasPermission = await this.requestPermissions();
@@ -353,7 +288,6 @@ class NotificationService {
         0
       );
 
-      // Schedule notification 1 hour before
       const reminderTime = new Date(appointmentDate);
       reminderTime.setHours(reminderTime.getHours() - 1);
 
@@ -382,5 +316,4 @@ class NotificationService {
   }
 }
 
-// Export singleton instance
 export default new NotificationService();

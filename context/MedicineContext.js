@@ -1,0 +1,450 @@
+import React, { createContext, useContext, useReducer } from "react";
+<<<<<<< HEAD
+import AsyncStorage from "@react-native-async-storage/async-storage";
+=======
+import storageService from "../services/storageService";
+import notificationService from "../services/notificationService";
+>>>>>>> dd0e490 (changes)
+
+const MedicineContext = createContext();
+
+const initialState = {
+  medicines: [],
+<<<<<<< HEAD
+=======
+  appointments: [],
+  medicineHistory: [],
+>>>>>>> dd0e490 (changes)
+  profile: null,
+  loading: false,
+  error: null,
+};
+
+const medicineReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_ERROR":
+      return { ...state, error: action.payload, loading: false };
+    case "LOAD_MEDICINES":
+      return { ...state, medicines: action.payload, loading: false };
+    case "ADD_MEDICINE":
+      return { ...state, medicines: [...state.medicines, action.payload] };
+    case "UPDATE_MEDICINE":
+      return {
+        ...state,
+        medicines: state.medicines.map((med) =>
+          med.id === action.payload.id ? action.payload : med
+        ),
+      };
+    case "DELETE_MEDICINE":
+      return {
+        ...state,
+        medicines: state.medicines.filter((med) => med.id !== action.payload),
+      };
+    case "LOAD_PROFILE":
+      return { ...state, profile: action.payload };
+    case "UPDATE_PROFILE":
+      return { ...state, profile: action.payload };
+<<<<<<< HEAD
+=======
+    case "LOAD_APPOINTMENTS":
+      return { ...state, appointments: action.payload, loading: false };
+    case "ADD_APPOINTMENT":
+      return {
+        ...state,
+        appointments: [...state.appointments, action.payload],
+      };
+    case "UPDATE_APPOINTMENT":
+      return {
+        ...state,
+        appointments: state.appointments.map((apt) =>
+          apt.id === action.payload.id ? action.payload : apt
+        ),
+      };
+    case "DELETE_APPOINTMENT":
+      return {
+        ...state,
+        appointments: state.appointments.filter(
+          (apt) => apt.id !== action.payload
+        ),
+      };
+    case "LOAD_MEDICINE_HISTORY":
+      return { ...state, medicineHistory: action.payload };
+>>>>>>> dd0e490 (changes)
+    default:
+      return state;
+  }
+};
+
+export const MedicineProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(medicineReducer, initialState);
+
+  const loadMedicines = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+<<<<<<< HEAD
+      const medicines = await AsyncStorage.getItem("@medimates_medicines");
+      dispatch({
+        type: "LOAD_MEDICINES",
+        payload: medicines ? JSON.parse(medicines) : [],
+=======
+      const medicines = await storageService.getMedicines();
+      dispatch({
+        type: "LOAD_MEDICINES",
+        payload: medicines || [],
+>>>>>>> dd0e490 (changes)
+      });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const addMedicine = async (medicineData) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const newMedicine = {
+        id: Date.now().toString(),
+        ...medicineData,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        lastTaken: null,
+      };
+
+      const updatedMedicines = [...state.medicines, newMedicine];
+<<<<<<< HEAD
+      await AsyncStorage.setItem(
+        "@medimates_medicines",
+        JSON.stringify(updatedMedicines)
+      );
+=======
+      await storageService.saveMedicines(updatedMedicines);
+
+      // Schedule notifications
+      await notificationService.scheduleMedicineNotifications(newMedicine);
+>>>>>>> dd0e490 (changes)
+
+      dispatch({ type: "ADD_MEDICINE", payload: newMedicine });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const updateMedicine = async (id, updates) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const updatedMedicines = state.medicines.map((med) =>
+        med.id === id ? { ...med, ...updates } : med
+      );
+
+<<<<<<< HEAD
+      await AsyncStorage.setItem(
+        "@medimates_medicines",
+        JSON.stringify(updatedMedicines)
+      );
+
+      const updatedMedicine = updatedMedicines.find((med) => med.id === id);
+=======
+      await storageService.saveMedicines(updatedMedicines);
+
+      const updatedMedicine = updatedMedicines.find((med) => med.id === id);
+
+      // Update notifications if times or frequency changed
+      if (updates.times || updates.frequency) {
+        await notificationService.updateMedicineNotifications(updatedMedicine);
+      }
+
+>>>>>>> dd0e490 (changes)
+      dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const deleteMedicine = async (id) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const updatedMedicines = state.medicines.filter((med) => med.id !== id);
+
+<<<<<<< HEAD
+      await AsyncStorage.setItem(
+        "@medimates_medicines",
+        JSON.stringify(updatedMedicines)
+      );
+=======
+      await storageService.saveMedicines(updatedMedicines);
+
+      // Cancel notifications
+      await notificationService.cancelMedicineNotifications(id);
+
+>>>>>>> dd0e490 (changes)
+      dispatch({ type: "DELETE_MEDICINE", payload: id });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+<<<<<<< HEAD
+  const markDoseTaken = async (id) => {
+    try {
+      const medicine = state.medicines.find((med) => med.id === id);
+      if (medicine) {
+        const updatedMedicines = state.medicines.map((med) =>
+          med.id === id ? { ...med, lastTaken: new Date().toISOString() } : med
+        );
+
+        await AsyncStorage.setItem(
+          "@medimates_medicines",
+          JSON.stringify(updatedMedicines)
+        );
+
+        const updatedMedicine = updatedMedicines.find((med) => med.id === id);
+        dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
+=======
+  const markDoseTaken = async (id, scheduledTime = null) => {
+    try {
+      const medicine = state.medicines.find((med) => med.id === id);
+      if (medicine) {
+        const now = new Date();
+        const updatedMedicines = state.medicines.map((med) =>
+          med.id === id ? { ...med, lastTaken: now.toISOString() } : med
+        );
+
+        await storageService.saveMedicines(updatedMedicines);
+
+        // Add to history
+        await storageService.addMedicineHistoryRecord({
+          medicineId: id,
+          medicineName: medicine.name,
+          dosage: medicine.dosage,
+          status: 'taken',
+          scheduledTime: scheduledTime || now.toISOString(),
+          takenTime: now.toISOString(),
+          date: now.toISOString().split('T')[0]
+        });
+
+        const updatedMedicine = updatedMedicines.find((med) => med.id === id);
+        dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
+        
+        // Reload history to update UI
+        loadMedicineHistory();
+      }
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const markDoseSkipped = async (id, scheduledTime = null) => {
+    try {
+      const medicine = state.medicines.find((med) => med.id === id);
+      if (medicine) {
+        const now = new Date();
+        
+        // Add to history
+        await storageService.addMedicineHistoryRecord({
+          medicineId: id,
+          medicineName: medicine.name,
+          dosage: medicine.dosage,
+          status: 'skipped',
+          scheduledTime: scheduledTime || now.toISOString(),
+          date: now.toISOString().split('T')[0]
+        });
+
+        // Reload history to update UI
+        loadMedicineHistory();
+>>>>>>> dd0e490 (changes)
+      }
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const loadProfile = async () => {
+    try {
+<<<<<<< HEAD
+      const profile = await AsyncStorage.getItem("@medimates_profile");
+      dispatch({
+        type: "LOAD_PROFILE",
+        payload: profile ? JSON.parse(profile) : null,
+=======
+      const profile = await storageService.getProfile();
+      dispatch({
+        type: "LOAD_PROFILE",
+        payload: profile,
+>>>>>>> dd0e490 (changes)
+      });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const updateProfile = async (profileData) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+<<<<<<< HEAD
+      await AsyncStorage.setItem(
+        "@medimates_profile",
+        JSON.stringify(profileData)
+      );
+=======
+      await storageService.saveProfile(profileData);
+>>>>>>> dd0e490 (changes)
+      dispatch({ type: "UPDATE_PROFILE", payload: profileData });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const getUpcomingDoses = () => {
+    const now = new Date();
+    const upcoming = [];
+
+    state.medicines.forEach((medicine) => {
+      if (!medicine.isActive) return;
+
+      medicine.times.forEach((time) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const doseTime = new Date();
+        doseTime.setHours(hours, minutes, 0, 0);
+
+        if (doseTime <= now) {
+          doseTime.setDate(doseTime.getDate() + 1);
+        }
+
+        upcoming.push({
+          medicineId: medicine.id,
+          medicineName: medicine.name,
+          dosage: medicine.dosage,
+          time: time,
+          scheduledTime: doseTime,
+          notes: medicine.notes,
+        });
+      });
+    });
+
+    return upcoming.sort((a, b) => a.scheduledTime - b.scheduledTime);
+  };
+
+<<<<<<< HEAD
+=======
+  const loadAppointments = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const appointments = await storageService.getAppointments();
+      dispatch({
+        type: "LOAD_APPOINTMENTS",
+        payload: appointments || [],
+      });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const addAppointment = async (appointmentData) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const newAppointment = {
+        id: Date.now().toString(),
+        ...appointmentData,
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedAppointments = [...state.appointments, newAppointment];
+      await storageService.saveAppointments(updatedAppointments);
+
+      // Schedule notification for appointment
+      await notificationService.scheduleAppointmentNotification(newAppointment);
+
+      dispatch({ type: "ADD_APPOINTMENT", payload: newAppointment });
+      return newAppointment;
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+      throw error;
+    }
+  };
+
+  const updateAppointment = async (id, updates) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const updatedAppointments = state.appointments.map((apt) =>
+        apt.id === id ? { ...apt, ...updates } : apt
+      );
+
+      await storageService.saveAppointments(updatedAppointments);
+
+      const updatedAppointment = updatedAppointments.find(
+        (apt) => apt.id === id
+      );
+      dispatch({ type: "UPDATE_APPOINTMENT", payload: updatedAppointment });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const deleteAppointment = async (id) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const updatedAppointments = state.appointments.filter(
+        (apt) => apt.id !== id
+      );
+
+      await storageService.saveAppointments(updatedAppointments);
+
+      dispatch({ type: "DELETE_APPOINTMENT", payload: id });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+  const loadMedicineHistory = async () => {
+    try {
+      // First fill missing history
+      await storageService.fillMissingHistory(state.medicines);
+      const history = await storageService.getMedicineHistory();
+      dispatch({ type: "LOAD_MEDICINE_HISTORY", payload: history || {} });
+    } catch (error) {
+      dispatch({ type: "SET_ERROR", payload: error.message });
+    }
+  };
+
+>>>>>>> dd0e490 (changes)
+  const value = {
+    ...state,
+    loadMedicines,
+    addMedicine,
+    updateMedicine,
+    deleteMedicine,
+    markDoseTaken,
+<<<<<<< HEAD
+    loadProfile,
+    updateProfile,
+    getUpcomingDoses,
+=======
+    markDoseSkipped,
+    loadProfile,
+    updateProfile,
+    getUpcomingDoses,
+    loadAppointments,
+    addAppointment,
+    updateAppointment,
+    deleteAppointment,
+    loadMedicineHistory,
+>>>>>>> dd0e490 (changes)
+  };
+
+  console.log("MedicineContext value:", Object.keys(value));
+
+  return (
+    <MedicineContext.Provider value={value}>
+      {children}
+    </MedicineContext.Provider>
+  );
+};
+
+export const useMedicine = () => {
+  const context = useContext(MedicineContext);
+  if (!context) {
+    throw new Error("useMedicine must be used within a MedicineProvider");
+  }
+  return context;
+};

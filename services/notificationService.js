@@ -41,9 +41,18 @@ class NotificationService {
       }
 
       const scheduledIds = [];
+      const now = new Date();
 
       for (const time of medicine.times) {
         const [hours, minutes] = time.split(":").map(Number);
+
+        const scheduledTime = new Date();
+        scheduledTime.setHours(hours, minutes, 0, 0);
+
+        if (scheduledTime <= now) {
+          scheduledTime.setDate(scheduledTime.getDate() + 1);
+        }
+
         const trigger = this.createTrigger(
           medicine.frequency,
           hours,
@@ -88,17 +97,19 @@ class NotificationService {
     const now = new Date();
     const scheduledTime = new Date();
     scheduledTime.setHours(hours, minutes, 0, 0);
+
     if (scheduledTime <= now) {
       scheduledTime.setDate(scheduledTime.getDate() + 1);
     }
 
     switch (frequency) {
       case "daily":
-        return {
+        const dailyTrigger = {
           hour: hours,
           minute: minutes,
           repeats: true,
         };
+        return dailyTrigger;
 
       case "weekly":
         const weekday = recurringPattern?.weekdays || [new Date().getDay()];

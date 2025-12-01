@@ -5,6 +5,7 @@ import { useMedicine } from "../context/MedicineContext";
 export const useHomeScreen = (navigation) => {
   const {
     medicines,
+    medicineHistory,
     loading,
     loadMedicines,
     deleteMedicine,
@@ -45,7 +46,10 @@ export const useHomeScreen = (navigation) => {
     async (dose) => {
       try {
         if (markDoseTaken) {
-          await markDoseTaken(dose.medicineId, dose.scheduledTime.toISOString());
+          await markDoseTaken(
+            dose.medicineId,
+            dose.scheduledTime.toISOString()
+          );
           Alert.alert("Success", `${dose.medicineName} marked as taken!`);
         }
       } catch (error) {
@@ -83,6 +87,7 @@ export const useHomeScreen = (navigation) => {
 
   return {
     medicines,
+    medicineHistory,
     loading,
     refreshing,
     upcomingDoses,

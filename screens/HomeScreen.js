@@ -112,6 +112,7 @@ export default function HomeScreen({ navigation }) {
   const { theme, spacing, typography, borderRadius, shadows } = useTheme();
   const {
     medicines,
+    medicineHistory,
     refreshing,
     upcomingDoses,
     onRefresh,
@@ -137,11 +138,28 @@ export default function HomeScreen({ navigation }) {
 
   // Calculate stats for Status Card
   const stats = useMemo(() => {
-    const total = medicines.length;
-    const taken = medicines.filter(m => m.lastTaken && new Date(m.lastTaken).toDateString() === new Date().toDateString()).length;
-    const pending = total - taken;
-    return { total, taken, pending };
-  }, [medicines]);
+    const today = new Date().toISOString().split("T")[0];
+    const todayHistory = medicineHistory[today];
+
+    let taken = 0;
+    let total = 0;
+
+    if (todayHistory) {
+      taken = todayHistory.taken || 0;
+    }
+
+    medicines.forEach((medicine) => {
+      if (medicine.times && medicine.isActive !== false) {
+        total += medicine.times.length;
+      }
+    });
+
+    taken = Math.min(taken, total);
+    const pending = Math.max(0, total - taken);
+    const percentage = total > 0 ? (taken / total) * 100 : 0;
+
+    return { total, taken, pending, percentage };
+  }, [medicines, medicineHistory]);
 
   // Memoized callbacks
   const renderUpcomingDose = useCallback(
@@ -173,46 +191,61 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>{getGreeting()},</Text>
-            <Text style={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
+            <Text style={styles.date}>
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })}
+            </Text>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
             <View style={styles.profileIcon}>
-                <Ionicons name="person" size={20} color="#fff" />
+              <Ionicons name="person" size={20} color="#fff" />
             </View>
           </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
-        <TouchableOpacity 
-          style={styles.searchBar} 
-          onPress={() => Alert.alert("Search", "Search functionality coming soon!")}
+        <TouchableOpacity
+          style={styles.searchBar}
+          onPress={() =>
+            Alert.alert("Search", "Search functionality coming soon!")
+          }
         >
-          <Ionicons name="search" size={22} color="#4D96FF" style={{ marginRight: 12 }} />
+          <Ionicons
+            name="search"
+            size={22}
+            color="#4D96FF"
+            style={{ marginRight: 12 }}
+          />
           <Text style={styles.searchText}>Search medicines...</Text>
         </TouchableOpacity>
 
         {/* Status Card */}
-        <TouchableOpacity 
+        <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => navigation.navigate('History')}
+          onPress={() => navigation.navigate("History")}
         >
           <View style={styles.statusCard}>
             <View style={styles.statusHeader}>
               <Text style={styles.statusTitle}>Today's Progress</Text>
               <Text style={styles.statusPercent}>
-                {stats.total > 0 ? Math.round((stats.taken / stats.total) * 100) : 0}%
+                {Math.round(stats.percentage)}%
               </Text>
             </View>
-            
+
             <View style={styles.progressBarBg}>
-              <View 
+              <View
                 style={[
-                  styles.progressBarFill, 
-                  { width: `${stats.total > 0 ? (stats.taken / stats.total) * 100 : 0}%` }
-                ]} 
+                  styles.progressBarFill,
+                  {
+                    width: `${stats.percentage}%`,
+                  },
+                ]}
               />
             </View>
-            
+
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.pending}</Text>
@@ -235,31 +268,36 @@ export default function HomeScreen({ navigation }) {
         {/* Quick Actions Grid */}
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.grid}>
-          <TouchableOpacity 
-            style={[styles.actionCard, { backgroundColor: '#4D96FF15' }]} 
-            onPress={() => navigation.navigate('AddMedicine')}
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: "#4D96FF15" }]}
+            onPress={() => navigation.navigate("AddMedicine")}
           >
-            <View style={[styles.iconCircle, { backgroundColor: '#4D96FF' }]}>
+            <View style={[styles.iconCircle, { backgroundColor: "#4D96FF" }]}>
               <Ionicons name="add-circle" size={24} color="#fff" />
             </View>
             <Text style={styles.actionTitle}>Add Medicine</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.actionCard, { backgroundColor: '#6BCB7715' }]} 
-            onPress={() => navigation.navigate('History')}
+
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: "#6BCB7715" }]}
+            onPress={() => navigation.navigate("History")}
           >
-            <View style={[styles.iconCircle, { backgroundColor: '#6BCB77' }]}>
+            <View style={[styles.iconCircle, { backgroundColor: "#6BCB77" }]}>
               <MaterialCommunityIcons name="history" size={24} color="#fff" />
             </View>
             <Text style={styles.actionTitle}>History</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.actionCard, { backgroundColor: '#FFB74D15' }]} 
-            onPress={() => Alert.alert("Coming Soon", "Directory feature will be available soon!")}
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: "#FFB74D15" }]}
+            onPress={() =>
+              Alert.alert(
+                "Coming Soon",
+                "Directory feature will be available soon!"
+              )
+            }
           >
-            <View style={[styles.iconCircle, { backgroundColor: '#FFB74D' }]}>
+            <View style={[styles.iconCircle, { backgroundColor: "#FFB74D" }]}>
               <Ionicons name="search" size={24} color="#fff" />
             </View>
             <Text style={styles.actionTitle}>Directory</Text>
@@ -268,7 +306,7 @@ export default function HomeScreen({ navigation }) {
 
         {upcomingDoses.length > 0 && (
           <View style={{ marginBottom: spacing.lg, marginTop: 10 }}>
-            <Text style={styles.sectionTitle}>Coming Up</Text>
+            <Text style={styles.sectionTitle}>Medicines Taken</Text>
             <FlatList
               data={upcomingDoses.slice(0, 3)}
               renderItem={renderUpcomingDose}
@@ -326,7 +364,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <FlatList
-      style={[styles.container, { backgroundColor: '#fff' }]}
+      style={[styles.container, { backgroundColor: "#fff" }]}
       contentContainerStyle={styles.scrollContent}
       data={medicines}
       renderItem={renderMedicine}
@@ -349,7 +387,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   scrollContent: {
     flexGrow: 1,
@@ -357,140 +395,140 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 25,
     marginTop: 10,
   },
   greeting: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   date: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
   },
   profileIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4D96FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#4D96FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 25,
     marginBottom: 25,
   },
   searchText: {
-    color: '#999',
+    color: "#999",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   statusCard: {
-    backgroundColor: '#4D96FF',
+    backgroundColor: "#4D96FF",
     borderRadius: 20,
     padding: 20,
     marginBottom: 30,
-    shadowColor: '#4D96FF',
+    shadowColor: "#4D96FF",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 15,
   },
   statusTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   statusPercent: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   progressBarBg: {
     height: 8,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 4,
     marginBottom: 20,
   },
   progressBarFill: {
-    height: '100%',
-    backgroundColor: '#fff',
+    height: "100%",
+    backgroundColor: "#fff",
     borderRadius: 4,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   statValue: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statLabel: {
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
     fontSize: 12,
     marginTop: 2,
   },
   statDivider: {
     width: 1,
     height: 30,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: "rgba(255,255,255,0.3)",
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 15,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     gap: 15,
     marginBottom: 20,
   },
   actionCard: {
-    width: '30%',
+    width: "30%",
     padding: 15,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 15,
   },
   iconCircle: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 10,
   },
   actionTitle: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
   },
   doseCard: {
     backgroundColor: "#fff",
@@ -505,7 +543,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: "#f0f0f0",
   },
   medicineCard: {
     backgroundColor: "#fff",
@@ -520,7 +558,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: "#f0f0f0",
   },
   doseInfo: {
     flex: 1,

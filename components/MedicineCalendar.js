@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
@@ -9,38 +9,106 @@ import { useMedicine } from "../context/MedicineContext";
 export default function MedicineCalendar({ medicines }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  const { medicineHistory } = useMedicine();
+  const { medicineHistory, appointments, loadAppointments } = useMedicine();
   const [markedDates, setMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  useEffect(() => {
     generateMarkedDates();
-  }, [medicineHistory]);
+  }, [medicineHistory, appointments]);
 
   const generateMarkedDates = () => {
     const marks = {};
-    
-    Object.keys(medicineHistory).forEach(date => {
+
+    Object.keys(medicineHistory).forEach((date) => {
       const entry = medicineHistory[date];
       const total = (entry.taken || 0) + (entry.skipped || 0);
-      
-      let color = "#3498db"; // default
+
+      let color = "#3498db";
       let text = "✓";
 
       if (entry.taken > 0 && entry.skipped === 0) {
-        color = "#27ae60"; // All taken (assuming no skipped means all taken, or at least some taken and none skipped explicitly)
+        color = "#27ae60";
         text = "✓";
       } else if (entry.taken > 0 && entry.skipped > 0) {
-        color = "#f39c12"; // Partial
+        color = "#f39c12";
         text = "⚠";
       } else if (entry.taken === 0 && entry.skipped > 0) {
-        color = "#e74c3c"; // Missed
+        color = "#e74c3c";
         text = "✗";
       }
 
-      marks[date] = { marked: true, dotColor: color, customText: text };
+      marks[date] = {
+        marked: true,
+        dotColor: color,
+        customText: text,
+        hasMedicine: true,
+      };
     });
+
+    console.log("Appointments to process:", appointments);
+
+    if (appointments && appointments.length > 0) {
+      appointments.forEach((appointment) => {
+        let appointmentDate;
+
+        if (appointment.date instanceof Date) {
+          appointmentDate = appointment.date.toISOString().split("T")[0];
+        } else if (typeof appointment.date === "string") {
+          appointmentDate = appointment.date.includes("T")
+            ? appointment.date.split("T")[0]
+            : appointment.date;
+        } else {
+          console.log(
+            "Skipping appointment with invalid date:",
+            appointment.date
+          );
+          return;
+        }
+
+        console.log("Processing appointment date:", appointmentDate);
+
+        if (marks[appointmentDate]) {
+          marks[appointmentDate].hasAppointment = true;
+          marks[appointmentDate].dotColor = "#9b59b6";
+          marks[appointmentDate].customText =
+            marks[appointmentDate].customText + " 🏥";
+        } else {
+          marks[appointmentDate] = {
+            marked: true,
+            dotColor: "#9b59b6",
+            customText: "🏥",
+            hasAppointment: true,
+          };
+        }
+      });
+    }
+
+    console.log("Final marks:", marks);
     setMarkedDates(marks);
+  };
+
+  const getDateInfo = (dateString) => {
+    const medicineInfo = markedDates[dateString];
+    const dayAppointments = appointments.filter((apt) => {
+      let appointmentDate;
+
+      if (apt.date instanceof Date) {
+        appointmentDate = apt.date.toISOString().split("T")[0];
+      } else if (typeof apt.date === "string") {
+        appointmentDate = apt.date.includes("T")
+          ? apt.date.split("T")[0]
+          : apt.date;
+      }
+
+      return appointmentDate === dateString;
+    });
+
+    return { medicineInfo, dayAppointments };
   };
 
   return (
@@ -55,7 +123,7 @@ export default function MedicineCalendar({ medicines }) {
               {
                 text: "Doctor Appointment",
                 onPress: () => {
-                  Alert.alert("Success", "Appointment screen would open here");
+                  navigation.navigate("Appointment");
                 },
               },
               {
@@ -109,36 +177,56 @@ export default function MedicineCalendar({ medicines }) {
           <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
             {new Date(selectedDate).toDateString()}
           </Text>
-          <Text
-            style={[styles.infoSubtitle, { color: theme.colors.textSecondary }]}
-          >
-            {markedDates[selectedDate]?.customText === "✓" &&
-              "All medicines taken"}
-            {markedDates[selectedDate]?.customText === "⚠" && "Partially taken"}
-            {markedDates[selectedDate]?.customText === "✗" && "Missed doses"}
-            {markedDates[selectedDate]?.customText === "🏥" &&
-              "Doctor appointment"}
-          </Text>
+
+          {markedDates[selectedDate] && (
+            <Text
+              style={[
+                styles.infoSubtitle,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              {markedDates[selectedDate]?.customText === "✓" &&
+                "All medicines taken"}
+              {markedDates[selectedDate]?.customText === "⚠" &&
+                "Partially taken"}
+              {markedDates[selectedDate]?.customText === "✗" && "Missed doses"}
+            </Text>
+          )}
+
+          {getDateInfo(selectedDate).dayAppointments.length > 0 && (
+            <View style={styles.appointmentSection}>
+              <Text
+                style={[styles.appointmentLabel, { color: theme.colors.text }]}
+              >
+                Appointments:
+              </Text>
+              {getDateInfo(selectedDate).dayAppointments.map((apt) => (
+                <View key={apt.id} style={styles.appointmentItem}>
+                  <Text
+                    style={[
+                      styles.appointmentTitle,
+                      { color: theme.colors.text },
+                    ]}
+                  >
+                    {apt.title}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.appointmentDoctor,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    Dr. {apt.doctor} at {apt.time}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           <TouchableOpacity
             style={styles.addAppointmentButton}
             onPress={() => {
-              Alert.alert(
-                "Add Appointment",
-                "Would you like to schedule a doctor appointment for this date?",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  {
-                    text: "Add Appointment",
-                    onPress: () => {
-                      // Navigate to appointment screen with selected date
-                      Alert.alert(
-                        "Success",
-                        "Appointment screen would open here"
-                      );
-                    },
-                  },
-                ]
-              );
+              navigation.navigate("Appointment");
             }}
           >
             <Text style={styles.addAppointmentText}>
@@ -147,6 +235,7 @@ export default function MedicineCalendar({ medicines }) {
           </TouchableOpacity>
         </View>
       )}
+
       <View style={styles.legend}>
         <Text style={styles.legendTitle}>Legend</Text>
         <View style={styles.legendItems}>
@@ -164,7 +253,7 @@ export default function MedicineCalendar({ medicines }) {
               style={[styles.legendText, { color: theme.colors.textSecondary }]}
             >
               Partially taken
-              </Text>
+            </Text>
           </View>
           <View style={styles.legendItem}>
             <View
@@ -175,7 +264,7 @@ export default function MedicineCalendar({ medicines }) {
           </View>
           <View style={styles.legendItem}>
             <View
-              style={[styles.legendColor, { backgroundColor: "#3498db" }]}
+              style={[styles.legendColor, { backgroundColor: "#9b59b6" }]}
             />
             <Text
               style={[styles.legendText, { color: theme.colors.textSecondary }]}
@@ -214,12 +303,10 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
   },
   quickAddButton: {
-    backgroundColor: "#27ae60",
-  },
-  quickAddButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
+    backgroundColor: "#27ae60",
   },
   quickAddText: {
     color: "#fff",
@@ -241,7 +328,35 @@ const styles = StyleSheet.create({
   infoSubtitle: {
     fontSize: 14,
     color: "#7f8c8d",
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  appointmentSection: {
+    marginVertical: 12,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  appointmentLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#2c3e50",
+  },
+  appointmentItem: {
+    marginBottom: 8,
+    paddingLeft: 8,
+  },
+  appointmentTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#2c3e50",
+    marginBottom: 2,
+  },
+  appointmentDoctor: {
+    fontSize: 12,
+    color: "#7f8c8d",
   },
   addAppointmentButton: {
     backgroundColor: "#3498db",
@@ -264,7 +379,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#2c3e50",
-
     marginBottom: 8,
   },
   legendItems: {

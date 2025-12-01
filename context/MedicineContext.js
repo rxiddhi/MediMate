@@ -153,15 +153,15 @@ export const MedicineProvider = ({ children }) => {
           medicineId: id,
           medicineName: medicine.name,
           dosage: medicine.dosage,
-          status: 'taken',
+          status: "taken",
           scheduledTime: scheduledTime || now.toISOString(),
           takenTime: now.toISOString(),
-          date: now.toISOString().split('T')[0]
+          date: now.toISOString().split("T")[0],
         });
 
         const updatedMedicine = updatedMedicines.find((med) => med.id === id);
         dispatch({ type: "UPDATE_MEDICINE", payload: updatedMedicine });
-        
+
         // Reload history to update UI
         loadMedicineHistory();
       }
@@ -175,15 +175,15 @@ export const MedicineProvider = ({ children }) => {
       const medicine = state.medicines.find((med) => med.id === id);
       if (medicine) {
         const now = new Date();
-        
+
         // Add to history
         await storageService.addMedicineHistoryRecord({
           medicineId: id,
           medicineName: medicine.name,
           dosage: medicine.dosage,
-          status: 'skipped',
+          status: "skipped",
           scheduledTime: scheduledTime || now.toISOString(),
-          date: now.toISOString().split('T')[0]
+          date: now.toISOString().split("T")[0],
         });
 
         // Reload history to update UI
@@ -218,6 +218,7 @@ export const MedicineProvider = ({ children }) => {
 
   const getUpcomingDoses = () => {
     const now = new Date();
+    const todayDate = now.toISOString().split("T")[0];
     const upcoming = [];
 
     state.medicines.forEach((medicine) => {
@@ -228,18 +229,28 @@ export const MedicineProvider = ({ children }) => {
         const doseTime = new Date();
         doseTime.setHours(hours, minutes, 0, 0);
 
+        // Skip doses that are in the past for today
         if (doseTime <= now) {
           doseTime.setDate(doseTime.getDate() + 1);
         }
 
-        upcoming.push({
-          medicineId: medicine.id,
-          medicineName: medicine.name,
-          dosage: medicine.dosage,
-          time: time,
-          scheduledTime: doseTime,
-          notes: medicine.notes,
-        });
+        // Check if this dose was already taken today
+        const isTakenToday =
+          medicine.lastTaken &&
+          new Date(medicine.lastTaken).toISOString().split("T")[0] ===
+            todayDate;
+
+        // Only show upcoming doses that haven't been taken today
+        if (!isTakenToday || doseTime.toISOString().split("T")[0] > todayDate) {
+          upcoming.push({
+            medicineId: medicine.id,
+            medicineName: medicine.name,
+            dosage: medicine.dosage,
+            time: time,
+            scheduledTime: doseTime,
+            notes: medicine.notes,
+          });
+        }
       });
     });
 
@@ -262,16 +273,44 @@ export const MedicineProvider = ({ children }) => {
   const addAppointment = async (appointmentData) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
+
+      let dateString;
+      if (appointmentData.date instanceof Date) {
+        dateString = appointmentData.date.toISOString().split("T")[0];
+      } else if (typeof appointmentData.date === "string") {
+        dateString = appointmentData.date.includes("T")
+          ? appointmentData.date.split("T")[0]
+          : appointmentData.date;
+      } else {
+        dateString = new Date(appointmentData.date).toISOString().split("T")[0];
+      }
+
+      let timeString;
+      if (appointmentData.time instanceof Date) {
+        timeString = appointmentData.time.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      } else {
+        timeString = appointmentData.time;
+      }
+
       const newAppointment = {
         id: Date.now().toString(),
-        ...appointmentData,
+        title: appointmentData.title,
+        doctor: appointmentData.doctor,
+        location: appointmentData.location || "",
+        notes: appointmentData.notes || "",
+        type: appointmentData.type || "checkup",
+        date: dateString,
+        time: timeString,
         createdAt: new Date().toISOString(),
       };
 
       const updatedAppointments = [...state.appointments, newAppointment];
       await storageService.saveAppointments(updatedAppointments);
 
-      // Schedule notification for appointment
       await notificationService.scheduleAppointmentNotification(newAppointment);
 
       dispatch({ type: "ADD_APPOINTMENT", payload: newAppointment });
@@ -341,7 +380,7 @@ export const MedicineProvider = ({ children }) => {
     addAppointment,
     updateAppointment,
     deleteAppointment,
-    loadMedicineHistory
+    loadMedicineHistory,
   };
 
   console.log("MedicineContext value:", Object.keys(value));

@@ -111,8 +111,31 @@ export default function AppointmentScreen({ navigation, route }) {
   };
 
   const renderAppointmentCard = ({ item }) => {
-    const appointmentDate = new Date(item.date);
-    const appointmentTime = new Date(item.time);
+    let appointmentDateString, appointmentTimeString;
+
+    if (item.date instanceof Date) {
+      appointmentDateString = item.date.toLocaleDateString();
+    } else if (typeof item.date === "string") {
+      appointmentDateString = new Date(item.date).toLocaleDateString();
+    } else {
+      appointmentDateString = new Date(item.date).toLocaleDateString();
+    }
+
+    if (typeof item.time === "string") {
+      appointmentTimeString = item.time;
+    } else if (item.time instanceof Date) {
+      appointmentTimeString = item.time.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } else {
+      appointmentTimeString = new Date(item.time).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    }
 
     const getTypeColor = (type) => {
       switch (type) {
@@ -175,16 +198,12 @@ export default function AppointmentScreen({ navigation, route }) {
             <Text
               style={[styles.appointmentDate, { color: theme.colors.primary }]}
             >
-              📅 {appointmentDate.toLocaleDateString()}
+              📅 {appointmentDateString}
             </Text>
             <Text
               style={[styles.appointmentTime, { color: theme.colors.primary }]}
             >
-              🕐{" "}
-              {appointmentTime.toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              🕐 {appointmentTimeString}
             </Text>
           </View>
           {item.notes && (

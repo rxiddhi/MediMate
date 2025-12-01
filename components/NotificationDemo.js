@@ -5,6 +5,7 @@ export default function NotificationDemo({ medicine }) {
   const [demoNotifications, setDemoNotifications] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [countdowns, setCountdowns] = useState({});
+  const [istaken, setIstaken] = useState(false);
 
   useEffect(() => {
     if (medicine && medicine.times) {
@@ -26,6 +27,10 @@ export default function NotificationDemo({ medicine }) {
       {
         text: "Mark as Taken",
         onPress: () => {
+          setIstaken(true);
+          if (istaken) {
+            Alert.alert("Great!", `You have taken ${medicine.name}.`);
+          }
           setDemoNotifications((prev) =>
             prev.map((n) =>
               n.id === notification.id ? { ...n, triggered: true } : n

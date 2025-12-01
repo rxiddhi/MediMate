@@ -10,7 +10,7 @@ export default {
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
-      backgroundColor: "#27ae60",
+      backgroundColor: "#7C3AED",
     },
 
     assetBundlePatterns: ["**/*"],
@@ -26,7 +26,7 @@ export default {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#27ae60",
+        backgroundColor: "#7C3AED",
       },
       package: "com.medimate.app",
       permissions: [
@@ -37,18 +37,12 @@ export default {
       ],
     },
 
-    web: {
-      favicon: "./assets/favicon.png",
-    },
-
-    scheme: "medimate",
-
     plugins: [
       [
         "expo-notifications",
         {
           icon: "./assets/notification-icon.png",
-          color: "#27ae60",
+          color: "#7C3AED",
           sounds: ["./assets/notification.wav"],
         },
       ],

@@ -190,8 +190,10 @@ export default function HomeScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>{getGreeting()},</Text>
-            <Text style={styles.date}>
+            <Text style={[styles.greeting, { color: theme.colors.text }]}>
+              {getGreeting()},
+            </Text>
+            <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "long",
@@ -200,7 +202,12 @@ export default function HomeScreen({ navigation }) {
             </Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-            <View style={styles.profileIcon}>
+            <View
+              style={[
+                styles.profileIcon,
+                { backgroundColor: theme.colors.primary },
+              ]}
+            >
               <Ionicons name="person" size={20} color="#fff" />
             </View>
           </TouchableOpacity>
@@ -216,10 +223,14 @@ export default function HomeScreen({ navigation }) {
           <Ionicons
             name="search"
             size={22}
-            color="#4D96FF"
+            color={theme.colors.primary}
             style={{ marginRight: 12 }}
           />
-          <Text style={styles.searchText}>Search medicines...</Text>
+          <Text
+            style={[styles.searchText, { color: theme.colors.placeholder }]}
+          >
+            Search medicines...
+          </Text>
         </TouchableOpacity>
 
         {/* Status Card */}
@@ -227,7 +238,15 @@ export default function HomeScreen({ navigation }) {
           activeOpacity={0.9}
           onPress={() => navigation.navigate("History")}
         >
-          <View style={styles.statusCard}>
+          <View
+            style={[
+              styles.statusCard,
+              {
+                backgroundColor: theme.colors.primary,
+                shadowColor: theme.colors.primary,
+              },
+            ]}
+          >
             <View style={styles.statusHeader}>
               <Text style={styles.statusTitle}>Today's Progress</Text>
               <Text style={styles.statusPercent}>
@@ -266,30 +285,55 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
 
         {/* Quick Actions Grid */}
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Quick Actions
+        </Text>
         <View style={styles.grid}>
           <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: "#4D96FF15" }]}
+            style={[
+              styles.actionCard,
+              { backgroundColor: theme.colors.primary + "15" },
+            ]}
             onPress={() => navigation.navigate("AddMedicine")}
           >
-            <View style={[styles.iconCircle, { backgroundColor: "#4D96FF" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.colors.primary },
+              ]}
+            >
               <Ionicons name="add-circle" size={24} color="#fff" />
             </View>
-            <Text style={styles.actionTitle}>Add Medicine</Text>
+            <Text style={[styles.actionTitle, { color: theme.colors.text }]}>
+              Add Medicine
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: "#6BCB7715" }]}
+            style={[
+              styles.actionCard,
+              { backgroundColor: theme.colors.success + "15" },
+            ]}
             onPress={() => navigation.navigate("History")}
           >
-            <View style={[styles.iconCircle, { backgroundColor: "#6BCB77" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.colors.success },
+              ]}
+            >
               <MaterialCommunityIcons name="history" size={24} color="#fff" />
             </View>
-            <Text style={styles.actionTitle}>History</Text>
+            <Text style={[styles.actionTitle, { color: theme.colors.text }]}>
+              History
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: "#FFB74D15" }]}
+            style={[
+              styles.actionCard,
+              { backgroundColor: theme.colors.warning + "15" },
+            ]}
             onPress={() =>
               Alert.alert(
                 "Coming Soon",
@@ -297,16 +341,25 @@ export default function HomeScreen({ navigation }) {
               )
             }
           >
-            <View style={[styles.iconCircle, { backgroundColor: "#FFB74D" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.colors.warning },
+              ]}
+            >
               <Ionicons name="search" size={24} color="#fff" />
             </View>
-            <Text style={styles.actionTitle}>Directory</Text>
+            <Text style={[styles.actionTitle, { color: theme.colors.text }]}>
+              Directory
+            </Text>
           </TouchableOpacity>
         </View>
 
         {upcomingDoses.length > 0 && (
           <View style={{ marginBottom: spacing.lg, marginTop: 10 }}>
-            <Text style={styles.sectionTitle}>Medicines Taken</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              Medicines Taken
+            </Text>
             <FlatList
               data={upcomingDoses.slice(0, 3)}
               renderItem={renderUpcomingDose}
@@ -329,7 +382,9 @@ export default function HomeScreen({ navigation }) {
         />
 
         <View style={{ marginTop: spacing.lg }}>
-          <Text style={styles.sectionTitle}>Your Medicines</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Your Medicines
+          </Text>
         </View>
       </Animated.View>
     ),
@@ -364,7 +419,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <FlatList
-      style={[styles.container, { backgroundColor: "#fff" }]}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       contentContainerStyle={styles.scrollContent}
       data={medicines}
       renderItem={renderMedicine}
@@ -414,8 +469,7 @@ const styles = StyleSheet.create({
   profileIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#4D96FF",
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -425,7 +479,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     paddingHorizontal: 15,
     paddingVertical: 15,
-    borderRadius: 25,
+    borderRadius: 28,
     marginBottom: 25,
   },
   searchText: {
@@ -435,7 +489,7 @@ const styles = StyleSheet.create({
   },
   statusCard: {
     backgroundColor: "#4D96FF",
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
     marginBottom: 30,
     shadowColor: "#4D96FF",
@@ -463,13 +517,13 @@ const styles = StyleSheet.create({
   progressBarBg: {
     height: 8,
     backgroundColor: "rgba(255,255,255,0.3)",
-    borderRadius: 4,
+    borderRadius: 6,
     marginBottom: 20,
   },
   progressBarFill: {
     height: "100%",
     backgroundColor: "#fff",
-    borderRadius: 4,
+    borderRadius: 6,
   },
   statsRow: {
     flexDirection: "row",
@@ -511,7 +565,7 @@ const styles = StyleSheet.create({
   actionCard: {
     width: "30%",
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
@@ -519,7 +573,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
@@ -532,7 +586,7 @@ const styles = StyleSheet.create({
   },
   doseCard: {
     backgroundColor: "#fff",
-    borderRadius: 14,
+    borderRadius: 18,
     padding: 18,
     marginBottom: 10,
     flexDirection: "row",
@@ -547,7 +601,7 @@ const styles = StyleSheet.create({
   },
   medicineCard: {
     backgroundColor: "#fff",
-    borderRadius: 14,
+    borderRadius: 18,
     padding: 18,
     marginBottom: 10,
     flexDirection: "row",
@@ -596,7 +650,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#27ae60",
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 10,
+    borderRadius: 14,
   },
   takenButtonText: {
     color: "#fff",

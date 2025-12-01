@@ -8,58 +8,58 @@ const ThemeContext = createContext();
 export const lightTheme = {
   mode: "light",
   colors: {
-    // Primary Healthcare Blues
-    primary: "#0066CC",
-    primaryLight: "#3385D6",
-    primaryDark: "#0052A3",
+    // Primary - Modern Vibrant Purple
+    primary: "#7C3AED",
+    primaryLight: "#9F7CFF",
+    primaryDark: "#5A2DB8",
 
-    // Secondary Healthcare Greens
-    secondary: "#00A86B",
-    secondaryLight: "#33BA87",
-    secondaryDark: "#008556",
+    // Secondary - Vibrant Orange
+    secondary: "#F97316",
+    secondaryLight: "#FFB78A",
+    secondaryDark: "#C55A0C",
 
     // Backgrounds
-    background: "#F5F7FA",
+    background: "#F8FAFF",
     backgroundAlt: "#FFFFFF",
     surface: "#FFFFFF",
     card: "#FFFFFF",
 
     // Text Colors
-    text: "#1A1D1F",
+    text: "#11121A",
     textSecondary: "#6F7787",
     textTertiary: "#9EA4B3",
     textInverse: "#FFFFFF",
 
     // Borders & Dividers
-    border: "#E4E7EB",
-    borderLight: "#F0F2F5",
+    border: "#E7EBFF",
+    borderLight: "#F3F6FF",
     divider: "#EAECEF",
 
     // Status Colors
-    success: "#00A86B",
+    success: "#06B6D4",
     successLight: "#E6F7F0",
     error: "#E63946",
     errorLight: "#FDEAEC",
-    warning: "#FF9500",
+    warning: "#F97316",
     warningLight: "#FFF4E6",
-    info: "#0066CC",
-    infoLight: "#E6F2FF",
+    info: "#7C3AED",
+    infoLight: "#F0E9FF",
 
     // Healthcare Specific
     urgent: "#E63946",
     prescription: "#8B5CF6",
-    appointment: "#0066CC",
-    vitals: "#00A86B",
+    appointment: "#7C3AED",
+    vitals: "#06B6D4",
 
     // UI Elements
     disabled: "#D1D5DB",
     placeholder: "#9EA4B3",
-    shadow: "rgba(0, 0, 0, 0.1)",
+    shadow: "rgba(124, 58, 237, 0.08)",
     overlay: "rgba(0, 0, 0, 0.5)",
 
     // Gradients
-    gradientStart: "#0066CC",
-    gradientEnd: "#00A86B",
+    gradientStart: "#7C3AED",
+    gradientEnd: "#06B6D4",
   },
 };
 
@@ -67,58 +67,58 @@ export const lightTheme = {
 export const darkTheme = {
   mode: "dark",
   colors: {
-    // Primary Healthcare Blues (brighter for dark)
-    primary: "#4A9EFF", // Pops on black
-    primaryLight: "#6BB0FF",
-    primaryDark: "#3385D6",
+    // Primary - Vibrant Purple tuned for dark
+    primary: "#9F7CFF",
+    primaryLight: "#BFAEFF",
+    primaryDark: "#7C3AED",
 
-    // Secondary Healthcare Greens
-    secondary: "#3FD195", // Fresh, alive
-    secondaryLight: "#5FDDA8",
-    secondaryDark: "#2BB97E",
+    // Secondary - Vibrant Orange accents
+    secondary: "#F97316",
+    secondaryLight: "#FFB78A",
+    secondaryDark: "#C55A0C",
 
     // Backgrounds - TRUE BLACK with subtle layers
-    background: "#000000", // Pure black, OLED-friendly
-    backgroundAlt: "#0A0A0A", // Barely lifted
-    surface: "#121212", // Cards, elevated
-    card: "#1A1A1A", // Main card background
+    background: "#000000",
+    backgroundAlt: "#07060A",
+    surface: "#0F0F10",
+    card: "#141217",
 
     // Text Colors - softer whites
-    text: "#F0F0F0", // Not pure white, easier on eyes
-    textSecondary: "#A8A8A8",
-    textTertiary: "#707070",
+    text: "#F4F3FF",
+    textSecondary: "#B9B3D9",
+    textTertiary: "#8A889A",
     textInverse: "#0A0A0A",
 
     // Borders & Dividers - subtle in dark
-    border: "#2A2A2A",
-    borderLight: "#1E1E1E",
-    divider: "#252525",
+    border: "#1B1A2A",
+    borderLight: "#0F0E14",
+    divider: "#1E1D28",
 
     // Status Colors (vibrant for dark)
-    success: "#3FD195",
-    successLight: "#1A3D2F",
+    success: "#06B6D4",
+    successLight: "#06384A",
     error: "#FF6B6B",
     errorLight: "#3D1F21",
-    warning: "#FFB84D",
+    warning: "#F97316",
     warningLight: "#3D2F1F",
-    info: "#5EAAFF",
-    infoLight: "#1F2D3D",
+    info: "#9F7CFF",
+    infoLight: "#2A2333",
 
     // Healthcare Specific
     urgent: "#FF7B7B",
     prescription: "#B39DFF",
-    appointment: "#6BB0FF",
-    vitals: "#3FD195",
+    appointment: "#9F7CFF",
+    vitals: "#06B6D4",
 
     // UI Elements
-    disabled: "#404040",
-    placeholder: "#606060",
-    shadow: "rgba(0, 0, 0, 0.6)", // Deeper shadows
+    disabled: "#303033",
+    placeholder: "#50505A",
+    shadow: "rgba(124, 58, 237, 0.16)", // Deeper tinted shadow
     overlay: "rgba(0, 0, 0, 0.85)",
 
     // Gradients
-    gradientStart: "#4A9EFF",
-    gradientEnd: "#3FD195",
+    gradientStart: "#9F7CFF",
+    gradientEnd: "#06B6D4",
   },
 };
 
@@ -214,12 +214,12 @@ export const spacing = {
 
 // Border radius - IMPERFECT by design, like hand-drawn
 export const borderRadius = {
-  xs: 6, // Subtle softness
-  sm: 10, // Buttons, small cards
-  md: 14, // Main cards - not 12, not 16!
-  lg: 18, // Large cards, modals
-  xl: 22, // Heroic elements
-  "2xl": 28, // Big personality
+  xs: 8, // Subtle softness
+  sm: 14, // Buttons, small cards
+  md: 18, // Main cards
+  lg: 24, // Large cards, modals
+  xl: 32, // Heroic elements
+  "2xl": 36, // Big personality
   pill: 100, // Full pill shape
   circle: 9999, // Perfect circles
 };

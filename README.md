@@ -1,143 +1,227 @@
 # MediMate
 
-A mobile medicine management app built with React Native and Expo that helps you track medication schedules, manage appointments, and stay on top of your health routine.
+A beautiful and intuitive mobile medicine management app built with React Native and Expo that helps you track medication schedules, manage appointments, and stay on top of your health routine.
 
-## What It Does
+## 🎥 Demo
 
-MediMate simplifies medicine management by letting you add your medications, set reminders for when to take them, and keep a history of your doses. The app sends you notifications when it's time to take medicine, lets you mark doses as taken, and provides a clear overview of your medication schedule.
+Watch the full app demo: [MediMate Demo Video](https://drive.google.com/file/d/1pIUb08Q-aeEPc2HkriY800CcjVimu9EJ/view?usp=sharing)
 
-## Features
+## ✨ Features
 
-**Medicine Management**
-- Add medications with dosage, frequency, and timing
-- Add personal notes to medicines
-- Delete medicines when no longer needed
-- View all medicines in an organized list
+### 💊 Medicine Management
+- **Add medications** with dosage, frequency, and timing
+- **Set custom reminders** for each medicine dose
+- **Personal notes** for special instructions (take with food, etc.)
+- **Easy deletion** when medicines are no longer needed
+- **Organized medicine list** with quick overview
 
-**Dose Scheduling and Reminders**
-- See upcoming doses throughout the day
-- Get push notifications for reminders
-- View time remaining until next dose
-- Mark doses as taken with one tap
+### 🔔 Smart Notifications
+- **Push notifications** at scheduled medicine times
+- **Time remaining** counter for next dose
+- **Mark as taken** directly from notification or app
+- **Automatic reminders** throughout the day
+- **Customizable notification times**
 
-**Health Dashboard**
-- See today's medication progress at a glance
-- Track how many medicines you've taken today
-- View a calendar of your medication history
-- Get personalized greetings throughout the day
+### 📊 Health Dashboard
+- **Today's progress** card showing medication compliance
+- **Upcoming doses** list with countdown timers
+- **Personalized greetings** that change throughout the day
+- **Quick action buttons** for common tasks
+- **Medicine calendar** view for history tracking
 
-**Appointment Management**
-- Schedule doctor visits and checkups
-- Integrate appointments with your medicine schedule
+### 👤 User Profile
+- **Personal health information** (age, blood type, medical notes)
+- **Emergency contact** with one-tap dialing
+- **Medical history** and allergies tracking
+- **Doctor information** storage
+- **Easy editing** with save confirmation
 
-**Profile and Settings**
-- Manage your personal health information
-- Customize app preferences
-- Choose between dark and light mode
+### 📞 Emergency Directory
+- **Quick-dial contacts** for emergencies
+- **Emergency contact sync** from profile
+- **Add/edit/delete contacts** with modal interface
+- **One-tap calling** for rapid contact
 
-**Health History**
-- View a complete log of medicines taken
-- Track your medication compliance over time
+### 📅 Appointment Management
+- **Schedule doctor visits** and checkups
+- **Appointment tracking** alongside medicines
+- **Notification reminders** for appointments
+- **Complete appointment history**
 
-## Built With
+### 📈 Health History & Analytics
+- **Complete medicine intake log** with timestamps
+- **Daily medication compliance** tracking
+- **Historical view** of medicines taken and skipped
+- **Searchable history** for quick lookups
 
-- React Native 0.81.4
-- Expo 54.0.10
-- React Navigation 7.x
-- React Context API for state management
-- AsyncStorage for data persistence
-- Push notifications via Expo Notifications
-- Calendar component for date tracking
-- Icons from Ionicons and MaterialCommunityIcons
+### 🎨 User Experience
+- **Dark mode and light mode** themes
+- **Modern, vibrant color palette** (Purple, Orange, Cyan)
+- **Smooth animations** and transitions
+- **Responsive design** for all screen sizes
+- **Search functionality** across medicines and history
+- **Intuitive navigation** with bottom tabs
 
-## Project Structure
+## 🛠 Tech Stack
 
-The app is organized into clear folders:
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| React Native | 0.81.4 | Mobile app framework |
+| Expo | 54.0.10 | Development and deployment |
+| React Navigation | 7.x | App navigation |
+| React Context API | - | Global state management |
+| AsyncStorage | - | Local data persistence |
+| Expo Notifications | - | Push notifications |
+| Vector Icons | - | UI icons (Ionicons, MaterialCommunityIcons) |
 
-- **screens/**: Main app pages (Home, Add Medicine, Appointments, Profile, Settings, History)
-- **components/**: Reusable UI elements like medicine cards and calendars
-- **navigation/**: Navigation setup and routing
-- **context/**: Global state management using React Context
-- **hooks/**: Custom React hooks for screen logic
-- **services/**: Notifications and data storage
-- **features/**: Feature-specific code for appointments, medicines, and profiles
-- **constants/**: App-wide constants and configurations
-- **utils/**: Helper functions
-- **assets/**: Images and icons
+## 📁 Project Structure
 
-## Getting Started
+```
+medi-mate/
+├── screens/              # Main app pages
+│   ├── HomeScreen.js
+│   ├── AddMedicineScreen.js
+│   ├── ProfileScreen.js
+│   ├── DirectoryScreen.js
+│   ├── HistoryScreen.js
+│   ├── AppointmentScreen.js
+│   └── SettingsScreen.js
+├── components/           # Reusable UI components
+│   ├── MedicineCalendar.js
+│   ├── MedicineItem.js
+│   └── NotificationDemo.js
+├── navigation/           # Navigation configuration
+│   ├── RootNavigator.js
+│   └── TabNavigator.js
+├── context/              # Global state management
+│   ├── MedicineContext.js
+│   └── ThemeContext.js
+├── hooks/                # Custom React hooks
+│   ├── useHomeScreen.js
+│   └── useAddMedicine.js
+├── services/             # API and utility services
+│   ├── storageService.js
+│   └── notificationService.js
+├── features/             # Feature-specific modules
+│   ├── appointment/
+│   ├── medicine/
+│   └── profile/
+├── constants/            # App constants
+├── utils/                # Helper functions
+├── assets/               # Images and resources
+└── app.json              # Expo configuration
+```
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js v16 or higher
-- npm or yarn package manager
-- Expo CLI installed globally
-- iOS or Android emulator, or a physical device
+- **Node.js** v16 or higher
+- **npm** or **yarn** package manager
+- **Expo CLI** installed globally: `npm install -g expo-cli`
+- iOS simulator (macOS) or Android emulator, or a physical device
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/rxiddhi/MediMate.git
    cd medi-mate
    ```
 
-2. Install dependencies:
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. **Start the development server:**
    ```bash
    npm start
    ```
 
-4. Run on your device:
+4. **Run on your device:**
    ```bash
-   npm run ios      # For iOS (macOS only)
-   npm run android  # For Android
-   npm run web      # For web browser
+   # Scan QR code with Expo Go app on your phone
+   # Or run on emulator:
+   npm run ios      # iOS simulator (macOS only)
+   npm run android  # Android emulator
+   npm run web      # Web browser
    ```
 
-### Available Commands
+## 📋 Available Commands
 
-- `npm start`: Start the development server
-- `npm run ios`: Run on iOS simulator
-- `npm run android`: Run on Android emulator
-- `npm run web`: Run in web browser
-- `npm run build:android`: Build for Android
-- `npm run build:ios`: Build for iOS
-- `npm submit:android`: Submit to Google Play Store
-- `npm submit:ios`: Submit to Apple App Store
+| Command | Purpose |
+|---------|---------|
+| `npm start` | Start the Expo development server |
+| `npm run ios` | Run on iOS simulator |
+| `npm run android` | Run on Android emulator |
+| `npm run web` | Run in web browser |
+| `npm run build:android` | Create Android APK/AAB |
+| `npm run build:ios` | Create iOS build |
+| `npm submit:android` | Submit to Google Play Store |
+| `npm submit:ios` | Submit to Apple App Store |
 
-## How It Works
+## 📖 How to Use
 
-**Home Screen Dashboard**
-When you open the app, you'll see your medication progress for the day. The dashboard shows upcoming doses, how many medicines you've taken, and quick access to add new medicines or view history.
+### Adding Your First Medicine
+1. Tap the **"Add Medicine"** button on the home screen
+2. Enter medicine name and dosage
+3. Set the frequency (daily, weekly, etc.) and times
+4. Add optional notes (e.g., "take with food")
+5. Save and start receiving reminders
 
-**Adding Medicines**
-Add a new medicine by providing its name, dosage, how often you take it, and what times. You can also add personal notes like "take with food" or any special instructions.
+### Tracking Your Doses
+1. View **upcoming doses** on the home screen
+2. When notified, tap **"✓ Taken"** to mark medicine as taken
+3. Check **"Today's Progress"** card for daily compliance
+4. Review **History** tab for detailed logs
 
-**Getting Reminders**
-The app sends you notifications at scheduled times to remind you to take your medicine. You can tap the notification to open the app, or tap "Taken" directly in the notification.
+### Managing Your Profile
+1. Go to **Profile** tab
+2. Tap **"Edit Profile"** to add personal information
+3. Add **emergency contact** for quick dialing
+4. Include **medical notes**, allergies, and doctor info
+5. Tap **"Save Changes"** to persist data
 
-**Tracking History**
-All your medicine intake is recorded. You can view your history to see which medicines you've taken and when, helping you stay consistent with your medication schedule.
+### Using Emergency Directory
+1. Go to **Directory** tab to view emergency contacts
+2. Tap **"Add"** to create new contact
+3. Add name, phone, and relationship
+4. Tap **"Call"** for one-tap emergency calling
+5. Edit or delete contacts as needed
 
-**Appointments**
-You can also schedule doctor visits and appointments alongside your medicine tracking for a complete health management experience.
+## 💾 Data Storage
 
-## How Data is Stored
+All your information is stored **securely on your device** using AsyncStorage. Your data:
+- ✅ Stays private and never leaves your phone
+- ✅ Is backed up in your device storage
+- ✅ Can be accessed offline
+- ✅ Is persistent across app sessions
 
-All your information is stored securely on your device using local storage. Your medicines, appointments, and history stay private and never leave your phone.
+## 🎨 Customization
 
-## Contributing
+The app features a **Modern Vibrant theme** with:
+- **Primary Color:** Purple (#7C3AED)
+- **Secondary Color:** Orange (#F97316)
+- **Accent Color:** Cyan (#06B6D4)
+- **Full dark mode support** with automatic system detection
 
-Contributions are welcome. Feel free to submit pull requests or open issues for bugs and feature requests.
+Customize the theme in `context/ThemeContext.js`.
 
-## License
+## 🤝 Contributing
 
-This project is private and owned by rxiddhi.
+Contributions are welcome! Feel free to:
+- Submit pull requests for new features
+- Open issues for bugs and improvements
+- Suggest UX/UI enhancements
 
-## Support
+## 📄 License
 
-For questions or issues, please open an issue on GitHub.
+This project is private and owned by **rxiddhi**.
+
+## 📞 Support
+
+For questions, issues, or feature requests, please open an issue on [GitHub](https://github.com/rxiddhi/MediMate/issues).
+
+---
+
+**Made with ❤️ to help you stay healthy and on top of your medications.**

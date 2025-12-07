@@ -8,10 +8,12 @@ import {
   RefreshControl,
   Alert,
   Animated,
+  TextInput,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useHomeScreen } from "../hooks/useHomeScreen";
 import { useTheme } from "../context/ThemeContext";
+import { useMedicine } from "../context/MedicineContext";
 import MedicineCalendar from "../components/MedicineCalendar";
 
 const getGreeting = () => {
@@ -120,9 +122,12 @@ export default function HomeScreen({ navigation }) {
     handleDeleteMedicine,
   } = useHomeScreen(navigation);
 
+  const { profile } = useMedicine();
+
   // State for mood check-in card
   const [showMoodCard, setShowMoodCard] = useState(true);
   const [selectedMood, setSelectedMood] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fade animation for cards - FIXED: Use useRef
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -189,9 +194,15 @@ export default function HomeScreen({ navigation }) {
       <Animated.View style={{ opacity: fadeAnim }}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={[styles.greeting, { color: theme.colors.text }]}>
-              {getGreeting()},
+              {getGreeting()}
+              {profile && profile.name ? `, ` : null}
+              {profile && profile.name ? (
+                <Text style={{ color: theme.colors.primary }}>
+                  {profile.name}
+                </Text>
+              ) : null}
             </Text>
             <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
               {new Date().toLocaleDateString("en-US", {
@@ -201,37 +212,42 @@ export default function HomeScreen({ navigation }) {
               })}
             </Text>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-            <View
-              style={[
-                styles.profileIcon,
-                { backgroundColor: theme.colors.primary },
-              ]}
-            >
-              <Ionicons name="person" size={20} color="#fff" />
-            </View>
-          </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
-        <TouchableOpacity
-          style={styles.searchBar}
-          onPress={() =>
-            Alert.alert("Search", "Search functionality coming soon!")
-          }
+        <View
+          style={[
+            styles.searchBar,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+            },
+          ]}
         >
           <Ionicons
             name="search"
             size={22}
-            color={theme.colors.primary}
+            color={theme.colors.textTertiary}
             style={{ marginRight: 12 }}
           />
-          <Text
-            style={[styles.searchText, { color: theme.colors.placeholder }]}
-          >
-            Search medicines...
-          </Text>
-        </TouchableOpacity>
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search medicines..."
+            placeholderTextColor={theme.colors.textTertiary}
+            style={[styles.searchTextInput, { color: theme.colors.text }]}
+            returnKeyType="search"
+          />
+          {searchQuery ? (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+          ) : null}
+        </View>
 
         {/* Status Card */}
         <TouchableOpacity
@@ -334,12 +350,7 @@ export default function HomeScreen({ navigation }) {
               styles.actionCard,
               { backgroundColor: theme.colors.warning + "15" },
             ]}
-            onPress={() =>
-              Alert.alert(
-                "Coming Soon",
-                "Directory feature will be available soon!"
-              )
-            }
+            onPress={() => navigation.navigate("Directory")}
           >
             <View
               style={[
@@ -397,6 +408,7 @@ export default function HomeScreen({ navigation }) {
       fadeAnim,
       spacing,
       stats, // Added stats dependency
+      searchQuery,
     ]
   );
 
@@ -405,23 +417,48 @@ export default function HomeScreen({ navigation }) {
     () => (
       <View style={styles.emptyState}>
         <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
-          No medicines added yet
+          {searchQuery
+            ? "No medicines match your search"
+            : "No medicines added yet"}
         </Text>
-        <Text
-          style={[styles.emptySubtext, { color: theme.colors.textTertiary }]}
-        >
-          Tap the + button to add your first medicine
-        </Text>
+        {!searchQuery && (
+          <Text
+            style={[styles.emptySubtext, { color: theme.colors.textTertiary }]}
+          >
+            Tap the + button to add your first medicine
+          </Text>
+        )}
       </View>
     ),
-    [theme]
+    [theme, searchQuery]
   );
+
+  const filteredMedicines = useMemo(() => {
+    if (!searchQuery) return medicines;
+    const q = searchQuery.toLowerCase().trim();
+    return medicines.filter((m) => {
+      const name = (m.name || "").toLowerCase();
+      const dosage = (m.dosage || "").toLowerCase();
+      const notes = (m.notes || "").toLowerCase();
+      const frequency = (m.frequency || "").toLowerCase();
+      const times = Array.isArray(m.times)
+        ? m.times.join(" ").toLowerCase()
+        : "";
+      return (
+        name.includes(q) ||
+        dosage.includes(q) ||
+        notes.includes(q) ||
+        frequency.includes(q) ||
+        times.includes(q)
+      );
+    });
+  }, [medicines, searchQuery]);
 
   return (
     <FlatList
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       contentContainerStyle={styles.scrollContent}
-      data={medicines}
+      data={filteredMedicines}
       renderItem={renderMedicine}
       keyExtractor={keyExtractor}
       ListHeaderComponent={ListHeaderComponent}
@@ -450,9 +487,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
     marginBottom: 25,
     marginTop: 10,
   },
@@ -460,6 +495,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     color: "#333",
+    flexWrap: "wrap",
   },
   date: {
     fontSize: 16,
@@ -486,6 +522,12 @@ const styles = StyleSheet.create({
     color: "#999",
     fontSize: 16,
     fontWeight: "500",
+  },
+  searchTextInput: {
+    fontSize: 16,
+    fontWeight: "500",
+    flex: 1,
+    paddingVertical: 8,
   },
   statusCard: {
     backgroundColor: "#4D96FF",

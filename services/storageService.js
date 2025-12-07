@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   NOTIFICATIONS: "@medimates_notifications",
   APPOINTMENTS: "@medimates_appointments",
   MEDICINE_HISTORY: "@medimates_medicine_history",
+  DIRECTORY: "@medimates_directory",
 };
 
 /**
@@ -169,6 +170,16 @@ class StorageService {
     return this.setItem(STORAGE_KEYS.APPOINTMENTS, appointments);
   }
 
+  // Directory (emergency contacts) methods
+  async getDirectory() {
+    const directory = await this.getItem(STORAGE_KEYS.DIRECTORY);
+    return directory || [];
+  }
+
+  async saveDirectory(directory) {
+    return this.setItem(STORAGE_KEYS.DIRECTORY, directory);
+  }
+
   // Medicine history methods
   // Medicine history methods
   async getMedicineHistory() {
@@ -184,9 +195,9 @@ class StorageService {
     const history = await this.getMedicineHistory();
     // Maintain backward compatibility or migrate if needed
     // For now, we assume we are switching to the object-based format: { "YYYY-MM-DD": { taken: 0, skipped: 0, details: [] } }
-    
-    const dateStr = record.date || new Date().toISOString().split('T')[0];
-    
+
+    const dateStr = record.date || new Date().toISOString().split("T")[0];
+
     if (!history[dateStr]) {
       history[dateStr] = { taken: 0, skipped: 0, details: [] };
     }
@@ -198,9 +209,9 @@ class StorageService {
     });
 
     // Update counts
-    if (record.status === 'taken') {
+    if (record.status === "taken") {
       history[dateStr].taken = (history[dateStr].taken || 0) + 1;
-    } else if (record.status === 'skipped') {
+    } else if (record.status === "skipped") {
       history[dateStr].skipped = (history[dateStr].skipped || 0) + 1;
     }
 
@@ -216,12 +227,12 @@ class StorageService {
     try {
       const history = await this.getMedicineHistory();
       const dates = Object.keys(history).sort();
-      
+
       // Helper to get local date string YYYY-MM-DD
       const getLocalDateStr = (date) => {
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       };
 
@@ -231,22 +242,22 @@ class StorageService {
       // 1. Update past "pending" items to "skipped"
       for (const date of dates) {
         if (date >= todayStr) continue; // Only process past days
-        
+
         const entry = history[date];
         if (entry && Array.isArray(entry.details)) {
           let changed = false;
           let taken = 0;
           let skipped = 0;
-          
-          const newDetails = entry.details.map(item => {
-            if (item.status === 'pending') {
+
+          const newDetails = entry.details.map((item) => {
+            if (item.status === "pending") {
               changed = true;
               skipped++;
-              return { ...item, status: 'skipped' };
-            } else if (item.status === 'taken') {
+              return { ...item, status: "skipped" };
+            } else if (item.status === "taken") {
               taken++;
               return item;
-            } else if (item.status === 'skipped') {
+            } else if (item.status === "skipped") {
               skipped++;
               return item;
             } else {
@@ -285,10 +296,10 @@ class StorageService {
       if (hasUpdates) {
         await this.saveMedicineHistory(history);
       }
-      
+
       return history;
     } catch (error) {
-      console.error('Error filling missing history:', error);
+      console.error("Error filling missing history:", error);
       return {};
     }
   }

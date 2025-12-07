@@ -211,6 +211,27 @@ export const MedicineProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true });
       await storageService.saveProfile(profileData);
       dispatch({ type: "UPDATE_PROFILE", payload: profileData });
+      // If emergency contact exists, add/update it in the directory
+      try {
+        if (profileData && profileData.emergencyContact) {
+          const directory = await storageService.getDirectory();
+          const phone = profileData.emergencyContact;
+          const name = profileData.name || "Emergency Contact";
+          const existing = directory.find((c) => c.phone === phone);
+          if (!existing) {
+            const newContact = {
+              id: Date.now().toString(),
+              name,
+              phone,
+              relationship: "Primary Emergency",
+            };
+            const updatedDir = [newContact, ...directory];
+            await storageService.saveDirectory(updatedDir);
+          }
+        }
+      } catch (err) {
+        console.error("Error updating directory from profile:", err);
+      }
     } catch (error) {
       dispatch({ type: "SET_ERROR", payload: error.message });
     }

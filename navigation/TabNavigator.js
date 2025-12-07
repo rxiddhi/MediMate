@@ -5,6 +5,7 @@ import HomeScreen from "../screens/HomeScreen";
 import AddMedicineScreen from "../screens/AddMedicineScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import AppointmentScreen from "../screens/AppointmentScreen";
+import DirectoryScreen from "../screens/DirectoryScreen";
 import { useTheme } from "../context/ThemeContext";
 
 const Tab = createBottomTabNavigator();
@@ -20,6 +21,8 @@ export default function TabNavigator() {
           let iconName;
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "Directory") {
+            iconName = focused ? "people" : "people-outline";
           } else if (route.name === "AddMedicine") {
             iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === "Appointment") {
@@ -49,6 +52,11 @@ export default function TabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{ tabBarLabel: "Home" }}
+      />
+      <Tab.Screen
+        name="Directory"
+        component={DirectoryScreen}
+        options={{ tabBarLabel: "Directory" }}
       />
       <Tab.Screen
         name="AddMedicine"

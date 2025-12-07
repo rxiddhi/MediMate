@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Linking,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useMedicine } from "../context/MedicineContext";
 import { useTheme } from "../context/ThemeContext";
 
@@ -63,7 +65,13 @@ export default function ProfileScreen() {
     setIsEditing(false);
   };
 
-  const renderField = (label, field, placeholder, multiline = false) => (
+  const renderField = (
+    label,
+    field,
+    placeholder,
+    multiline = false,
+    options = {}
+  ) => (
     <View style={styles.fieldContainer}>
       <Text style={[styles.fieldLabel, { color: theme.colors.text }]}>
         {label}
@@ -83,9 +91,40 @@ export default function ProfileScreen() {
           onChangeText={(value) => handleInputChange(field, value)}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.textTertiary}
+          keyboardType={options.keyboardType}
           multiline={multiline}
           numberOfLines={multiline ? 3 : 1}
         />
+      ) : field === "emergencyContact" ? (
+        <TouchableOpacity
+          onPress={() => {
+            const phone = formData[field];
+            if (phone) {
+              const url = `tel:${phone}`;
+              Linking.canOpenURL(url).then((supported) => {
+                if (supported) Linking.openURL(url);
+                else
+                  Alert.alert(
+                    "Cannot call",
+                    "This device cannot make phone calls"
+                  );
+              });
+            }
+          }}
+        >
+          <Text
+            style={[
+              styles.fieldValue,
+              {
+                color: theme.colors.textSecondary,
+                backgroundColor: theme.colors.card,
+                borderColor: theme.colors.border,
+              },
+            ]}
+          >
+            {formData[field] || "Not specified"}
+          </Text>
+        </TouchableOpacity>
       ) : (
         <Text
           style={[
@@ -125,12 +164,16 @@ export default function ProfileScreen() {
             { backgroundColor: theme.colors.primary },
           ]}
         >
-          <Text style={styles.avatarText}>
-            {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
-          </Text>
+          {isEditing ? (
+            <Text style={styles.avatarText}>
+              {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
+            </Text>
+          ) : (
+            <Ionicons name="person" size={40} color="#fff" />
+          )}
         </View>
         <Text style={[styles.title, { color: theme.colors.text }]}>
-          {formData.name || "Your Profile"}
+          {isEditing ? "Edit Profile" : "Your Profile"}
         </Text>
         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
           Your personal and medical information
@@ -144,11 +187,15 @@ export default function ProfileScreen() {
           </Text>
 
           {renderField("Full Name", "name", "Enter your full name")}
-          {renderField("Age", "age", "Enter your age")}
+          {renderField("Age", "age", "Enter your age", false, {
+            keyboardType: "number-pad",
+          })}
           {renderField(
             "Emergency Contact",
             "emergencyContact",
-            "Phone number of emergency contact"
+            "Phone number of emergency contact",
+            false,
+            { keyboardType: "phone-pad" }
           )}
           {renderField("Blood Type", "bloodType", "e.g., A+, B-, O+, AB+")}
         </View>
@@ -178,7 +225,6 @@ export default function ProfileScreen() {
             "Your doctor's name and contact",
             true
           )}
-
         </View>
 
         <View style={styles.section}>
